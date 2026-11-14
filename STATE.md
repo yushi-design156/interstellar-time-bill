@@ -2,7 +2,7 @@
 
 > 暂停 / 恢复用。「暂停一下」= 停手并更新这份存档；「继续开始」= 从这里接着做。
 
-最后更新：2026-11-14 20:15 · 第 1 周
+最后更新：2026-11-14 21:35 · 第 1 周 · **已上线**
 
 ## 一、已定的六件事（不再改）
 
@@ -35,24 +35,20 @@
 5. qwen3 是思考模型：`think: false` 必须显式关，否则预算全烧在 `<think>`，`response` 是空的。
 6. 模型会编数字（「三小时」「数万倍」）→ 已加服务端护栏：句子里出现数字就弃用，退回只用真值的既定文案。
 
-## 四、下一个动作（从这里接着做）
+## 四、已发布
 
-**发布到 GitHub Pages** —— 代码已提交，只差认证：
+**https://yushi-design156.github.io/interstellar-time-bill/**
+仓库 `yushi-design156/interstellar-time-bill`（公开）· 走 SSH（`~/.ssh/id_ed25519`），无 token、无 gh CLI。
 
-```bash
-cd ~/Projects/interstellar-time-bill
-gh auth login                    # 浏览器里输一次性码，只能你本人做
-gh repo create interstellar-time-bill --public --source=. --push
-gh api -X POST repos/{owner}/interstellar-time-bill/pages \
-  -f 'source[branch]=main' -f 'source[path]=/'
-```
+线上验收过（不是只看 200）：主视觉读数 7.00、三张账单卡、对照表四行、手机 390 宽 0 溢出、
+three.module.js 哈希与本地一致、旁白按钮在线上是明确禁用态。
 
-Pages 起来后地址是 `https://<用户名>.github.io/interstellar-time-bill/`。
-线上没有 `server.mjs`，作战台会显示「需要本地服务」——那是设计内的降级，不是 bug。
+**下一个动作：第 2 周 —— 作品集包装。** 站酷一组图 + 小红书一条 + README 里的过程叙事，
+重点讲「电影为了效果把行星放在 ISCO 内侧」这个发现，这是别的黑洞页面没有的东西。
 
 ## 五、还没做
 
-- [ ] GitHub 认证 + 建仓 + 开 Pages（唯一卡住的事）
+- [x] GitHub 认证 + 建仓 + 开 Pages → 已上线
 - [ ] Safari 真机竖屏看一眼（这台机器 headless 浏览器只有 SwiftShader，截不到图）
 - [x] 账单视图对照表（三星球 + 地球并排、停留时长滑杆 15 分钟–24 小时实时重算、ISCO 内外标注）
 - [ ] OG 图与分享卡片
