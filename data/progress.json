@@ -1,0 +1,48 @@
+{
+  "project": "星际穿越时间账单 / Interstellar Time Bill",
+  "author": "yushi",
+  "updated": "2026-11-14",
+  "cadence": "每周 3 次 × 90 分钟",
+  "weeks": [
+    {
+      "id": "w1",
+      "title": "第 1 周 · 地基",
+      "goal": "公式能算出电影的数字，画面上有一颗会转的黑洞",
+      "sessions": [
+        { "id": "w1s1", "label": "① 克尔公式 + 单元测试（√2 / ISCO / 视界）", "done": true, "note": "11 项断言全通过" },
+        { "id": "w1s2", "label": "② 米勒行星反解：1h 必须等于 7 年", "done": true, "note": "r=1.0000188189M, D=61362, 3h20m=23.33y" },
+        { "id": "w1s3", "label": "③ Three.js 场景：吸积盘 + 引力透镜星空", "done": false, "note": "" }
+      ]
+    },
+    {
+      "id": "w2",
+      "title": "第 2 周 · 账单",
+      "goal": "三颗星球各自的代价，能讲清、能对比",
+      "sessions": [
+        { "id": "w2s1", "label": "① 三行星对比卡 + 电影复现（23 年 4 个月）", "done": false, "note": "" },
+        { "id": "w2s2", "label": "② 手机竖屏适配 + 局域网可访问", "done": false, "note": "" },
+        { "id": "w2s3", "label": "③ 文案与叙事：从数字到感受", "done": false, "note": "" }
+      ]
+    },
+    {
+      "id": "w3",
+      "title": "第 3 周 · AI 层与发布",
+      "goal": "一个窗口看到所有 AI 在干活；公网能打开",
+      "sessions": [
+        { "id": "w3s1", "label": "① 作战台接 Ollama/Dify/Xinference 真实状态", "done": false, "note": "" },
+        { "id": "w3s2", "label": "② 本地模型生成账单旁白，接进作品", "done": false, "note": "" },
+        { "id": "w3s3", "label": "③ 建公开 repo + GitHub Pages 上线", "done": false, "note": "" }
+      ]
+    },
+    {
+      "id": "w4",
+      "title": "第 4 周 · 成稿",
+      "goal": "能放进作品集的一页，加一段 90 秒录屏",
+      "sessions": [
+        { "id": "w4s1", "label": "① 性能与动效打磨（移动端 60fps）", "done": false, "note": "" },
+        { "id": "w4s2", "label": "② 站酷/Behance 作品页 + 90 秒录屏", "done": false, "note": "" },
+        { "id": "w4s3", "label": "③ 复盘：这份作品证明了什么能力", "done": false, "note": "" }
+      ]
+    }
+  ]
+}

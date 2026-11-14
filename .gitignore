@@ -1,0 +1,4 @@
+node_modules/
+logs/agent.jsonl
+logs-server.txt
+.DS_Store

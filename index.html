@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>星际穿越时间账单 · Interstellar Time Bill</title>
+<meta name="description" content="克尔黑洞参数 → 时间膨胀倍数 → 三颗星球各自的时间代价。可调质量、自转、轨道半径的实时可视化。">
+<meta name="theme-color" content="#07060b">
+<link rel="stylesheet" href="assets/style.css">
+<script type="importmap">
+{ "imports": {
+    "three": "https://esm.sh/three@0.160.1",
+    "three/addons/": "https://esm.sh/three@0.160.1/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <span class="brand-name">时间账单</span>
+    <span class="brand-en">TIME BILL</span>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button class="tab is-active" data-view="observe" role="tab">观测</button>
+    <button class="tab" data-view="bill" role="tab">账单</button>
+    <button class="tab" data-view="plan" role="tab">进度</button>
+    <button class="tab" data-view="ops" role="tab">作战台</button>
+  </nav>
+  <div class="status-dot" id="net-status" title="本地服务状态"><i></i></div>
+</header>
+
+<main>
+  <!-- ══════════ 观测 ══════════ -->
+  <section class="view is-shown" id="view-observe">
+    <div class="stage">
+      <canvas id="sky"></canvas>
+      <div class="observe-grid">
+        <div class="stage-copy">
+          <p class="kicker">克尔黑洞 · 赤道面顺行圆轨道</p>
+          <h1>你在那颗星球上<br>待一小时，<br>地球上过去了多少？</h1>
+          <p class="lede">拖动右侧三个参数。左边那团光会跟着变，<br>下面的账单会跟着变。没有一个数字是写死的。</p>
+        </div>
+
+      <aside class="panel">
+        <div class="modes" role="group" aria-label="模式">
+          <button class="mode is-active" data-mode="movie">电影模式</button>
+          <button class="mode" data-mode="sandbox">沙盒</button>
+        </div>
+
+        <div class="readout">
+          <div class="readout-label">行星上的 1 小时 = 地球的</div>
+          <div class="readout-value" id="dilation-value">7.00</div>
+          <div class="readout-unit" id="dilation-unit">年</div>
+          <div class="readout-sub" id="dilation-sub">米勒行星 · a/M = 0.99999999999999 · r = 1.0000188189 M</div>
+        </div>
+
+        <div class="sliders" id="sliders">
+          <label class="slider-row">
+            <span class="slider-name">质量 <em>M</em></span>
+            <input type="range" id="sl-mass" min="0" max="1" step="0.001" value="0.888">
+            <output class="slider-out" id="out-mass">100.0×10⁶ M☉</output>
+          </label>
+          <label class="slider-row">
+            <span class="slider-name">自转 <em>a/M</em></span>
+            <input type="range" id="sl-spin" min="0" max="1" step="0.0001" value="0.6">
+            <output class="slider-out" id="out-spin">0.6000</output>
+          </label>
+          <label class="slider-row">
+            <span class="slider-name">轨道半径 <em>r/M</em></span>
+            <input type="range" id="sl-radius" min="0" max="1" step="0.0005" value="0.6">
+            <output class="slider-out" id="out-radius">6.000 M</output>
+          </label>
+          <p class="slider-note" id="slider-note">半径滑杆用对数刻度；左下界是 ISCO，再往里没有稳定轨道。</p>
+        </div>
+
+        <div class="hint" id="physics-hint"></div>
+      </aside>
+      </div>
+    </div>
+
+    <div class="planet-chips" id="planet-chips" role="group" aria-label="三颗星球"></div>
+
+    <div class="bill-strip">
+      <div class="bill-stay">
+        <span class="bill-stay-label">停留</span>
+        <div class="chips" id="stay-chips">
+          <button class="chip is-active" data-hours="1">1 小时</button>
+          <button class="chip" data-hours="3.3333">3 时 20 分</button>
+          <button class="chip" data-hours="24">24 小时</button>
+        </div>
+      </div>
+      <div class="bill-figures">
+        <figure><figcaption>地球上过去</figcaption><span id="bill-earth">23.3 年</span></figure>
+        <figure><figcaption>你错过的</figcaption><span id="bill-missed">23.3 年</span></figure>
+        <figure><figcaption>相对倍率</figcaption><span id="bill-factor">61,362×</span></figure>
+      </div>
+      <p class="bill-caption" id="bill-caption">你回来时，他们比你多了 23 年 4 个月。</p>
+    </div>
+  </section>
+
+  <!-- ══════════ 账单 ══════════ -->
+  <section class="view" id="view-bill">
+    <div class="page">
+      <p class="kicker">三颗星球 · 同一份停留时长</p>
+      <h2 class="page-title">时间账单</h2>
+      <p class="lede">同样的 3 小时 20 分。一颗星球吃掉你二十三年，另两颗几乎不动。<br>差别不在你做了什么，只在你站在引力井的哪一格。</p>
+      <div class="bills" id="bills"></div>
+      <div class="ledger">
+        <h3>这份账单是怎么算出来的</h3>
+        <div class="formula">
+          <div class="formula-row">
+            <span class="formula-k">时间膨胀</span>
+            <code>dt/dτ = 1 / √(1 − 3M/r + 2aM<sup>1.5</sup>/r<sup>1.5</sup>)</code>
+          </div>
+          <div class="formula-row">
+            <span class="formula-k">稳定轨道内界</span>
+            <code>r<sub>ISCO</sub> = M{3 + Z₂ − √[(3−Z₁)(3+Z₁+2Z₂)]}</code>
+          </div>
+          <div class="formula-row">
+            <span class="formula-k">地球流逝</span>
+            <code>Δt<sub>地球</sub> = Δτ<sub>行星</sub> × dt/dτ</code>
+          </div>
+        </div>
+        <ul class="checks" id="checks"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 进度 ══════════ -->
+  <section class="view" id="view-plan">
+    <div class="page">
+      <p class="kicker">每周 3 次 × 90 分钟</p>
+      <h2 class="page-title">四周，从公式到作品集</h2>
+      <p class="lede">进度存在本机服务上，手机连同一个 Wi-Fi 打开 <code id="lan-url">http://本机IP:8787</code> 看到的是同一份。</p>
+      <div class="weeks" id="weeks"></div>
+      <div class="plan-foot">
+        <span id="plan-progress-text">0 / 0 已勾</span>
+        <button class="ghost" id="plan-export">导出勾选记录</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ 作战台 ══════════ -->
+  <section class="view" id="view-ops">
+    <div class="page">
+      <p class="kicker">本机服务 · 实时</p>
+      <h2 class="page-title">作战台</h2>
+      <p class="lede">这一页显示的是真实状态，不是示意图。绿色＝进程活着且真的应答；灰色＝没起。</p>
+      <div class="ops-grid" id="ops-grid"></div>
+      <div class="ops-log">
+        <div class="ops-log-head">
+          <h3>调用流</h3>
+          <button class="ghost" id="ops-narrate">让本地模型写一段账单旁白</button>
+        </div>
+        <ol class="stream" id="ops-stream"></ol>
+        <p class="ops-empty" id="ops-empty">还没有调用。点右上角那个按钮，或拖动观测页的滑杆后稍等。</p>
+      </div>
+      <div class="ops-foot">
+        <span class="mono" id="ops-updated">—</span>
+        <span class="mono" id="ops-hermes">Hermes 会话正在写这个项目</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
