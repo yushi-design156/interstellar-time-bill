@@ -538,7 +538,14 @@ function boot() {
   });
 
   if (!HAS_API) {
+    // 线上版没有 server.mjs：别留一个点了没反应的按钮
     $('net-status').title = '本地服务未连接（静态托管模式）';
+    const b = $('ops-narrate');
+    b.disabled = true;
+    b.textContent = '旁白需要本地服务';
+    b.style.opacity = '.45';
+    b.style.cursor = 'default';
+    $('ops-empty').textContent = '线上版只有静态页面。要看三路 AI 真的在跑，在本地 git clone 后执行 node server.mjs。';
   }
   $('lan-url').textContent = HAS_API ? `http://${location.hostname}:${location.port}` : '本地静态模式';
 

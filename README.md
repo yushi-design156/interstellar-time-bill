@@ -5,6 +5,9 @@
 
 作者：**yushi** · 山东工艺美术学院 产品设计
 
+**在线看**：https://yushi-design156.github.io/interstellar-time-bill/
+（three.js 打包在仓库里，不依赖 CDN；手机竖屏直接开）
+
 ---
 
 ## 一、它算的是什么
