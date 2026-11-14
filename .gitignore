@@ -1,4 +1,2 @@
-node_modules/
-logs/agent.jsonl
+logs/
 logs-server.txt
-.DS_Store

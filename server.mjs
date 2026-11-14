@@ -105,9 +105,13 @@ async function buildOps() {
     out.dify.note = '没应答。`cd ~/dify/docker && docker compose up -d`。';
   }
 
-  out.xinference = { up: xin.up };
+  // 401 也算活着：进程在跑，只是要 key —— 不能因为没 key 就说「没启动」
+  const xinAlive = xin.up || xin.status === 401;
+  out.xinference = { up: xinAlive };
   if (xin.up) {
     try { out.xinference.models = (JSON.parse(xin.body).data || []).map((m) => m.id); } catch {}
+  } else if (xinAlive) {
+    out.xinference.note = '已启动（401：要 API key 才能列模型）。面板 http://127.0.0.1:9997';
   } else {
     out.xinference.note = '没启动。装完用 `~/.xinference-venv/bin/xinference-local --port 9997`。';
   }
@@ -118,7 +122,7 @@ async function buildOps() {
 }
 
 /* ── 旁白 ── */
-const NARRATE_MODELS = ['qwen3:8b', 'qwen3.6:35b-a3b'];
+const NARRATE_MODELS = ['qwen3.6:35b-a3b', 'qwen3:8b'];
 
 async function narrate(payload) {
   const { factor = 1, radius = 1, spin = 0, stay = 1, earth = '—' } = payload || {};
@@ -126,7 +130,9 @@ async function narrate(payload) {
     '你是一个冷静的旁白，为一本科普作品写一句话。',
     `事实：行星上的 1 小时 = 地球的 ${factor.toFixed(2)} 小时；行星停留 ${stay} 小时，地球过去 ${earth}。`,
     `轨道半径 r = ${radius} M，黑洞自转 a/M = ${spin}。`,
-    '要求：一句中文，不超过 40 字，不煽情，不用感叹号，不说"让我们"，像物理学家顺口说的话。只输出这句话。',
+    '要求：一句中文，不超过 40 字。⚠️ 句子里不要出现任何数字（阿拉伯或汉字都不行），不要复述上面的数值，不要列算式，',
+    '不要煽情，不用感叹号，不说"让我们"。',
+    '不要说"这不仅是…"这种腔。像物理学家抬头看了一眼天，顺口说的一句话。只输出这句话。',
   ].join('\n');
 
   for (const model of NARRATE_MODELS) {
@@ -140,13 +146,19 @@ async function narrate(payload) {
         signal: ac.signal,
         body: JSON.stringify({
           model, prompt, stream: false,
-          options: { temperature: 0.85, num_predict: 160, top_p: 0.9 },
+          think: false,   // qwen3 是思考模型：不关掉的话预算全烧在 <think> 里，response 是空的
+          options: { temperature: 0.85, num_predict: 220, top_p: 0.9 },
         }),
       });
       const d = await r.json();
       let text = (d.response || '').replace(/<think[\s\S]*?<\/think>/g, '').trim();
+      if (!text && d.thinking) text = '';           // 只有思考、没有正文 = 预算不够，换下一个模型
       text = text.split('\n').filter(Boolean).pop() || text;
-      if (!r.ok || !text) throw new Error(d.error || 'empty');
+      text = text.replace(/^["「『]|["」』]$/g, '').trim();
+      if (!r.ok || !text) throw new Error(d.error || `empty(${d.done_reason || '?'})`);
+      // 作品里「没有一个数字是写死的」——模型编的数字一个都不能放出去
+      const NUMERAL = /[0-9０-９一二两三四五六七八九十百千万亿]|数万|数亿|上下|左右/;
+      if (NUMERAL.test(text)) throw new Error(`编了数字：「${text.slice(0, 20)}」`);
       const ms = Date.now() - t0;
       await logEvent('生成旁白', `「${text.slice(0, 40)}」`, `${model} · ${ms}ms`);
       return { ok: true, text, model, ms };
@@ -154,7 +166,11 @@ async function narrate(payload) {
       await logEvent('生成旁白失败', String(e.message || e).slice(0, 60), model);
     } finally { clearTimeout(timer); }
   }
-  return { ok: false, error: '所有本地模型都没应答' };
+  // 两个模型都编了数字 —— 宁可不写，也不让编出来的数进作品。退回一句只用真值的叙述
+  const years = (factor / 8766).toFixed(2);
+  const line = `行星上的一小时，地球上过去 ${years} 年。同一刻，两个地方。`;
+  await logEvent('旁白退回既定文案', `倍率 ${factor.toFixed(0)}×`, 'guard');
+  return { ok: true, text: line, model: 'guard-fallback', ms: 0 };
 }
 
 /* ── HTTP ── */
