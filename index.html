@@ -25,8 +25,6 @@
   <nav class="tabs" role="tablist">
     <button class="tab is-active" data-view="observe" role="tab">观测</button>
     <button class="tab" data-view="bill" role="tab">账单</button>
-    <button class="tab" data-view="plan" role="tab">进度</button>
-    <button class="tab" data-view="ops" role="tab">作战台</button>
   </nav>
   <div class="status-dot" id="net-status" title="本地服务状态"><i></i></div>
 </header>
@@ -42,8 +40,10 @@
           <h1>你在那颗星球上<br>待一小时，<br>地球上过去了多少？</h1>
           <p class="lede">拖动右侧三个参数。左边那团光会跟着变，<br>下面的账单会跟着变。没有一个数字是写死的。</p>
         </div>
+      </div>
+    </div>
 
-      <aside class="panel">
+    <aside class="panel">
         <div class="modes" role="group" aria-label="模式">
           <button class="mode is-active" data-mode="movie">电影模式</button>
           <button class="mode" data-mode="sandbox">沙盒</button>
@@ -76,9 +76,7 @@
         </div>
 
         <div class="hint" id="physics-hint"></div>
-      </aside>
-      </div>
-    </div>
+    </aside>
 
     <div class="planet-chips" id="planet-chips" role="group" aria-label="三颗星球"></div>
 
@@ -143,41 +141,6 @@
     </div>
   </section>
 
-  <!-- ══════════ 进度 ══════════ -->
-  <section class="view" id="view-plan">
-    <div class="page">
-      <p class="kicker">每周 3 次 × 90 分钟</p>
-      <h2 class="page-title">四周，从公式到作品集</h2>
-      <p class="lede">进度存在本机服务上，手机连同一个 Wi-Fi 打开 <code id="lan-url">http://本机IP:8787</code> 看到的是同一份。</p>
-      <div class="weeks" id="weeks"></div>
-      <div class="plan-foot">
-        <span id="plan-progress-text">0 / 0 已勾</span>
-        <button class="ghost" id="plan-export">导出勾选记录</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════ 作战台 ══════════ -->
-  <section class="view" id="view-ops">
-    <div class="page">
-      <p class="kicker">本机服务 · 实时</p>
-      <h2 class="page-title">作战台</h2>
-      <p class="lede">这一页显示的是真实状态，不是示意图。绿色＝进程活着且真的应答；灰色＝没起。</p>
-      <div class="ops-grid" id="ops-grid"></div>
-      <div class="ops-log">
-        <div class="ops-log-head">
-          <h3>调用流</h3>
-          <button class="ghost" id="ops-narrate">让本地模型写一段账单旁白</button>
-        </div>
-        <ol class="stream" id="ops-stream"></ol>
-        <p class="ops-empty" id="ops-empty">还没有调用。点右上角那个按钮，或拖动观测页的滑杆后稍等。</p>
-      </div>
-      <div class="ops-foot">
-        <span class="mono" id="ops-updated">—</span>
-        <span class="mono" id="ops-hermes">Hermes 会话正在写这个项目</span>
-      </div>
-    </div>
-  </section>
 </main>
 
 <script type="module" src="src/main.js"></script>

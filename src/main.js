@@ -367,7 +367,7 @@ function renderProgress() {
     el.innerHTML = `<div class="week-head"><h3>${w.title}</h3><p>${w.goal}</p></div><div class="week-body">${tasks}</div>`;
     host.appendChild(el);
   });
-  $('plan-progress-text').textContent = `${done} / ${total} 已勾`;
+  const _pt = $('plan-progress-text'); if (_pt) _pt.textContent = `${done} / ${total} 已勾`;
 
   host.querySelectorAll('.task').forEach((row) => {
     row.querySelector('input').addEventListener('change', async (e) => {
@@ -400,6 +400,7 @@ const SVC_META = {
 };
 
 async function refreshOps() {
+  if (!$('ops-grid')) return;   // 作战台已下线
   if (!HAS_API) {
     $('ops-grid').innerHTML = `<p class="ops-empty">这一页连的是我自己电脑上的三路本地 AI（Ollama / Dify / Xinference）。
       线上版只有静态页面，所以这里空着 —— 不是坏了。想在本地看它跑起来：<code>git clone</code> 后执行 <code>node server.mjs</code>，
@@ -528,8 +529,8 @@ function boot() {
   setMode('movie');
   selectPlanet('miller');
 
-  $('ops-narrate').addEventListener('click', narrate);
-  $('plan-export').addEventListener('click', () => {
+  if ($('ops-narrate')) $('ops-narrate').addEventListener('click', narrate);
+  if ($('plan-export')) $('plan-export').addEventListener('click', () => {
     const done = progress.weeks.flatMap((w) => w.sessions).filter((s) => s.done);
     const text = done.map((s) => `✓ ${s.label}${s.note ? '  — ' + s.note : ''}`).join('\n');
     navigator.clipboard?.writeText(text);
@@ -537,23 +538,9 @@ function boot() {
     setTimeout(() => ($('plan-export').textContent = '导出勾选记录'), 1400);
   });
 
-  if (!HAS_API) {
-    // 线上版没有 server.mjs：别留一个点了没反应的按钮
+  if (!HAS_API && $('net-status')) {
     $('net-status').title = '本地服务未连接（静态托管模式）';
-    const b = $('ops-narrate');
-    b.disabled = true;
-    b.textContent = '旁白需要本地服务';
-    b.style.opacity = '.45';
-    b.style.cursor = 'default';
-    $('ops-empty').textContent = '线上版只有静态页面。要看三路 AI 真的在跑，在本地 git clone 后执行 node server.mjs。';
   }
-  $('lan-url').textContent = HAS_API ? `http://${location.hostname}:${location.port}` : '本地静态模式';
-
-  // 观测页才轮询，省电
-  setInterval(() => {
-    if ($('view-ops').classList.contains('is-shown')) refreshOps();
-  }, 4000);
-  if (HAS_API) refreshOps();
 }
 
 document.addEventListener('DOMContentLoaded', boot);
