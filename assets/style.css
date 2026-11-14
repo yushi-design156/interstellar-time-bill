@@ -271,6 +271,60 @@ main { position: relative; }
 }
 
 /* ── 账单页 ── */
+.table-wrap { margin: 0 0 44px; }
+.table-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 22px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.table-head h3 {
+  font-family: var(--serif); font-weight: 400; font-size: 17px;
+  letter-spacing: .08em; margin: 0; color: var(--paper);
+}
+.stay { display: flex; align-items: center; gap: 12px; }
+.stay > span { font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; color: var(--faint); text-transform: uppercase; }
+.stay input[type=range] { width: 132px; }
+.stay output { font-size: 11px; color: var(--amber); min-width: 78px; }
+
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.bill-table {
+  width: 100%; border-collapse: collapse; min-width: 620px;
+  font-family: var(--mono); font-size: 11.5px;
+}
+.bill-table th {
+  text-align: left; font-weight: 400; font-size: 9px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--faint);
+  padding: 0 14px 12px 0; border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+.bill-table th:last-child, .bill-table td:last-child { padding-right: 0; }
+.bill-table td {
+  padding: 14px 14px 14px 0; border-bottom: 1px solid rgba(244,239,230,0.055);
+  vertical-align: middle; white-space: nowrap;
+}
+.bill-table tbody tr:hover { background: rgba(244,239,230,0.022); }
+.c-name { font-family: var(--serif); font-size: 14px; letter-spacing: .05em; color: var(--paper); }
+.c-name i {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  margin-right: 9px; vertical-align: middle; transform: translateY(-1px);
+}
+.c-name em { font-family: var(--mono); font-style: normal; font-size: 9px; color: var(--faint); margin-left: 7px; letter-spacing: .1em; }
+.c-num { font-variant-numeric: tabular-nums; color: var(--muted); }
+.c-cost { position: relative; min-width: 168px; }
+.c-cost .bar {
+  position: absolute; left: 0; top: 50%; height: 22px; transform: translateY(-50%);
+  background: linear-gradient(90deg, rgba(255,178,122,0.16), rgba(255,178,122,0.02));
+  border-left: 1px solid rgba(255,178,122,0.5); border-radius: 0 3px 3px 0;
+}
+.c-cost b {
+  position: relative; font-weight: 400; font-variant-numeric: tabular-nums;
+  color: var(--paper); font-size: 12.5px;
+}
+.c-flag { font-size: 10px; letter-spacing: .06em; }
+.c-flag.ok { color: var(--ok); }
+.c-flag.bad { color: #ff9d8a; }
+.table-foot {
+  margin: 14px 0 0; font-size: 10px; line-height: 1.7; color: var(--faint);
+  max-width: 74ch;
+}
 .page-title {
   font-family: var(--serif); font-weight: 400;
   font-size: clamp(30px, 4.4vw, 54px); letter-spacing: .02em;

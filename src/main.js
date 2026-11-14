@@ -245,8 +245,7 @@ function selectPlanet(id) {
 }
 
 /* ─────────────── 账单页 ─────────────── */
-function renderBill() {
-  const stay = 3 + 20 / 60;
+function renderBill(stay = 3 + 20 / 60) {
   const host = $('bills');
   host.innerHTML = '';
   planets.forEach((p) => {
@@ -265,6 +264,8 @@ function renderBill() {
     host.appendChild(card);
   });
 
+  renderTable(stay);
+
   const m = planets[0];
   const film = P.billFor(m, 3 + 20 / 60);
   $('checks').innerHTML = [
@@ -273,6 +274,61 @@ function renderBill() {
     `电影 3 小时 20 分 → ${film.years.toFixed(2)} 年（影片台词是 23 年 4 个月）✓`,
     `同一自转下，稳定轨道的天花板只有 1 小时 = ${P.humanizeFactor(m.ceiling).text} —— 差 ${(m.factor / m.ceiling).toFixed(1)} 倍`,
   ].map((t, i) => `<li class="${i === 3 ? 'bad' : ''}">${t}</li>`).join('');
+}
+
+/* 三颗星球 + 地球，并排同一份停留时长 */
+function renderTable(stay) {
+  const rows = planets.map((p) => ({
+    name: p.name,
+    sub: p.en,
+    r: p.r,
+    a: p.a,
+    factor: p.factor,
+    unstable: !!p.unstable,
+    isco: p.isco,
+    color: p.color,
+  }));
+  rows.push({ name: '地球', sub: 'Earth', r: null, a: null, factor: 1, unstable: false, color: 'var(--dim)' });
+
+  const maxYears = Math.max(...rows.map((x) => P.earthYearsFor(stay, x.factor)));
+
+  $('bill-table').innerHTML = `
+    <thead>
+      <tr>
+        <th>星球</th><th>轨道半径</th><th>时间倍率</th>
+        <th>那儿 1 小时</th><th>待 ${humanStay(stay)}，地球过去</th><th>轨道</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map((x) => {
+        const years = P.earthYearsFor(stay, x.factor);
+        const bar = Math.max(1.5, (years / maxYears) * 100);
+        return `<tr>
+          <td class="c-name"><i style="background:${x.color}"></i>${x.name}<em>${x.sub}</em></td>
+          <td class="c-num">${x.r == null ? '—' : (x.r < 1.001 ? x.r.toFixed(10) : x.r.toFixed(1))}${x.r == null ? '' : ' M'}</td>
+          <td class="c-num">${heroNum(x.factor)}×</td>
+          <td class="c-num">${P.humanizeFactor(x.factor).text}</td>
+          <td class="c-cost">
+            <span class="bar" style="width:${bar}%"></span>
+            <b>${durationFromHours(years * P.YEAR_HOURS)}</b>
+          </td>
+          <td class="c-flag ${x.unstable ? 'bad' : 'ok'}">${x.r == null ? '基准' : x.unstable ? 'ISCO 内侧 ✗' : '稳定 ✓'}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>`;
+
+  const m = planets[0];
+  $('table-foot').textContent =
+    `米勒的倍率是地球的 ${num(m.factor)} 倍 —— 但它的半径 ${m.r.toPrecision(10)} M 在 ISCO ${m.isco.toPrecision(8)} M 内侧（近 ${(m.isco - m.r).toExponential(2)} M），稳定圆轨道不允许停在那里。`;
+}
+
+function humanStay(h) {
+  if (h >= 1) {
+    const hh = Math.floor(h);
+    const mm = Math.round((h - hh) * 60);
+    return mm > 0 ? `${hh} 小时 ${mm} 分` : `${hh} 小时`;
+  }
+  return `${Math.round(h * 60)} 分钟`;
 }
 
 /* ─────────────── 进度页 ─────────────── */
@@ -455,7 +511,19 @@ function boot() {
   }
 
   bindControls();
-  renderBill();
+  const stay = $('sl-stay');
+  const stayH = stay ? parseFloat(stay.value) / 60 : 3 + 20 / 60;
+  $('stay-out').textContent = humanStay(stayH);
+  renderBill(stayH);
+
+  if (stay && !stay.dataset.bound) {
+    stay.dataset.bound = '1';
+    stay.addEventListener('input', () => {
+      const h = parseFloat(stay.value) / 60;
+      $('stay-out').textContent = humanStay(h);
+      renderBill(h);
+    });
+  }
   loadProgress();
   setMode('movie');
   selectPlanet('miller');

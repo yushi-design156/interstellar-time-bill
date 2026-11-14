@@ -108,6 +108,21 @@
       <h2 class="page-title">时间账单</h2>
       <p class="lede">同样的 3 小时 20 分。一颗星球吃掉你二十三年，另两颗几乎不动。<br>差别不在你做了什么，只在你站在引力井的哪一格。</p>
       <div class="bills" id="bills"></div>
+
+      <div class="table-wrap">
+        <div class="table-head">
+          <h3>并排看一遍</h3>
+          <label class="stay">
+            <span>你打算待多久</span>
+            <input type="range" id="sl-stay" min="15" max="1440" step="5" value="200" aria-label="停留时长（分钟）">
+            <output class="mono" id="stay-out">3 小时 20 分</output>
+          </label>
+        </div>
+        <div class="table-scroll">
+          <table class="bill-table" id="bill-table"></table>
+        </div>
+        <p class="table-foot mono" id="table-foot"></p>
+      </div>
       <div class="ledger">
         <h3>这份账单是怎么算出来的</h3>
         <div class="formula">
