@@ -345,7 +345,9 @@ const SVC_META = {
 
 async function refreshOps() {
   if (!HAS_API) {
-    $('ops-grid').innerHTML = `<p class="ops-empty">作战台需要本地服务：在项目目录运行 <code>node server.mjs</code>，再打开 http://localhost:8787</p>`;
+    $('ops-grid').innerHTML = `<p class="ops-empty">这一页连的是我自己电脑上的三路本地 AI（Ollama / Dify / Xinference）。
+      线上版只有静态页面，所以这里空着 —— 不是坏了。想在本地看它跑起来：<code>git clone</code> 后执行 <code>node server.mjs</code>，
+      再开 <code>http://localhost:8787</code>。</p>`;
     return;
   }
   try {
